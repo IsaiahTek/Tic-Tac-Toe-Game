@@ -32,5 +32,7 @@
   <preference name="android-installLocation" value="auto" />
   <preference name="android-windowSoftInputMode" value="stateVisible|adjustResize" />
     
+  <allow-navigation href="*" />
+    
   <icon src="icon.png" platform="android"/>
 </widget>
