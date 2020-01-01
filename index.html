@@ -2,40 +2,288 @@
 <html>
 <head>
 	<title>Tic Tac Toe Game</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body>
-	<style>
-		body{
-			background-image: url('bg2.png');
-			background-size: cover;
-			text-align: center;
-			display: flex;
-			height:90vh;
+	<meta name="viewport" content="width=device-width, initial-scale=1"><style>
+		@media(min-width: 800px) and (orientation:landscape){
+			div.row{
+				max-width: 70%;
+			}
 		}
-
-		a{text-decoration: none;}
-
-		section{
-			background-color: white;
-			padding:20px 30px 40px 30px;
+		body{
+			background-image: url('bg.jpeg');
+			background-size: cover;
+		}
+		.game-title{
+			font-size: 2.5rem;
+      margin-bottom: 0px;
+      margin-top: 10px;
+			text-align: center;
+      color:gold;
+      text-shadow: 1px 1px 5px black;
+		}
+		div.row{
+			display: flex;
+			margin:0px auto;
+			justify-content: center;
+		}
+		div.row span{
+			background-color: #FAFAFA;
+			display: flex;
+			min-width: 30%;
+			height: 25vh;
+			font-size: 130px;
+			text-align: center;
+		}
+		div.row span:nth-child(2){
+			border: ridge blue;
+			border-width: 0px 4px 0px 4px;
+		}
+		div.center span{
+			border: ridge blue;
+			border-width: 4px 0px 4px 0px;
+		}
+		div.center span:nth-child(2){
+			border: ridge blue;
+			border-width: 4px 4px 4px 4px;
+		}
+		div.row span:hover{
+			background-color: #F0F0F0;
+			cursor: pointer;
+		}
+		div.row span.taken{
+			background-color: #F0F0F0;
+			cursor: not-allowed;
+		}
+		div.row span>div{
 			align-self: center;
-			margin-right: auto;
-			margin-left: auto;
+			margin: 0px auto;
+		}
+		.disabled{
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			width: 100%;
+			height: 100%;
+			text-align: center;
+			background-color: rgba(0,0,25,.5);
+		}
+		.game-over{
+			margin-top: 25vh;
+			font-size: 2rem;
+			color: white;
+			text-shadow: 4px 5px 50px yellow;
+		}
+		.winner-box{
+			font-size: 1.5rem;
+			color: #3fff00;
 		}
 		.btn{
-			background-color: orange;
-			color: white;
-			padding: 8px 15px;
-			display: block;
+			font-size: 1rem;
+			border:4px solid green;
+			border-radius: 28px;
+			background-color: white;
+			padding:30px;
 		}
-	</style>
-	<section>
-		<div>
-			<h1>Tic Tac Toe Game</h1>
-			<p>Dear to play this game?</p>
-			<a class="btn" href="https://tic-tac-toe-7a73c.firebaseapp.com/">Play</a>
-		</div>
-	</section>
+		.hide{
+			display: none;
+		}
+		.comp{
+			background-color: orange !important;
+		}
+  </style>
+  
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/7.6.1/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/7.6.1/firebase-auth.js"></script>
+    <script defer src="/__/firebase/7.6.1/firebase-database.js"></script>
+    <script defer src="/__/firebase/7.6.1/firebase-messaging.js"></script>
+    <script defer src="/__/firebase/7.6.1/firebase-storage.js"></script>
+    <!-- initialize the SDK after all desired features are loaded -->
+    <!-- <script defer src="/__/firebase/init.js"></script> -->
+
+    
+  </head>
+  <body>
+    <section id="game_area">
+      <h1 class="game-title">Tic-Tac-Toe Game</h1>
+      <div class="row">
+        <span id="0"></span>
+        <span id="1"></span>
+        <span id="2"></span>
+      </div>
+      <div class="row center">
+        <span id="3"></span>
+        <span id="4"></span>
+        <span id="5"></span>
+      </div>
+      <div class="row">
+        <span id="6"></span>
+        <span id="7"></span>
+        <span id="8"></span>
+      </div>
+    </section>
+    <section class="hide" id="disable">
+      <h1 class="game-over">Game Over</h1>
+      <div class="winner-box" id="winner_box"></div>
+      <button id="" class="btn" onclick="location.reload()">Refresh to Play Again</button>
+    </section>
+  
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="/__/firebase/7.6.1/firebase-app.js"></script>
+  
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="/__/firebase/7.6.1/firebase-analytics.js"></script>
+
+    
+    <!-- For firebase-firestore -->
+    <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-firestore.js"></script>
+
+
+    <!-- Initialize Firebase -->
+    <!-- <script src="/__/firebase/init.js"></script> -->
+
+    <script>
+
+let player1 = 'Me',
+	player2 = 'computer',
+	nextPlayer = player2;
+let players = [player1, player2]
+let players_tics = {[player1]:[], [player2]:[]}	// [playerX]: '', is a computed property
+let comboArray = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
+let tics = document.getElementsByTagName('span');
+let players_sign = {[player1]:'O', [player2]:'X'}
+function take(event){
+	if(!document.getElementById(event.target.id).classList.contains('taken')){
+		player = alt_turn();
+		play(event.target.id, player)
+		if(!checkWin(player)){
+			let computer = alt_turn()
+			play(computerPlay(), computer)
+		}
+	}
+}
+function play(key, player){
+	let the_box = document.getElementById(key)
+	if(!the_box.classList.contains('taken')){
+		populatePlayerTics(key, player)
+		displayTic(the_box, player)
+		if(checkWin(player) || players_tics[player1].length + players_tics[player2].length == 9){
+			disableGame(setWinner(player));
+		}
+	}
+	the_box.classList.add('taken')
+}
+function setWinner(winner){
+	if(checkWin(winner)){
+		winnerBox = document.getElementById('winner_box');
+		winnerBox.append('The winner is '+winner)
+	}
+}
+function possibleCombo(arr){
+	//
+	isPossible = false
+	arrays = []
+	comboArray.forEach(x=>{
+		let collection = [];
+		x.forEach(y=>{
+			if(arr.includes(y)){
+				collection.push(y)
+			}
+		})
+		if(collection.length > 1){
+			arrays[0] = collection
+			arrays[1] = x;
+			isPossible = true;
+		}
+	})
+	return [isPossible, arrays]
+}
+function isPossibleCombo(arr){
+	return possibleCombo(arr)[0]
+}
+function getMissingComboKey(arr){
+	let possibleComboArr = possibleCombo(arr)[1][0]
+	let targetCombo = possibleCombo(arr)[1][1]
+	sumP = possibleComboArr.reduce((x,y)=>x+y)
+	sumT = targetCombo.reduce((x,y)=>x+y)
+	return sumT - sumP
+}
+function computerPlay(){
+	//If the player first plays any of [0,2,6,8]
+	if(players_tics[player1].length == 1 && [0,2,6,8].includes(players_tics[player1][0])){
+		playKey = 4;
+	}else if(players_tics[player1].length > 1){
+		//get possible combo direction missing data and play first
+		if(players_tics[player2].length>=2 && 
+			isPossibleCombo(players_tics[player2])  && 
+			!players_tics[player1].includes(getMissingComboKey(players_tics[player2]))
+			){
+			playKey = getMissingComboKey(players_tics[player2])
+		}else if(isPossibleCombo(players_tics[player1]) && 
+			!players_tics[player2].includes(getMissingComboKey(players_tics[player1]))
+			){
+			playKey = getMissingComboKey(players_tics[player1])
+		}else{
+			do{
+				playKey = Math.floor(Math.random()*9)
+			}while((players_tics[player1].includes(playKey) || players_tics[player2].includes(playKey)) && players_tics[player2].length < 4)
+		}
+	}else{
+		do{
+			playKey = Math.floor(Math.random()*9)
+		}while((players_tics[player1].includes(playKey) || players_tics[player2].includes(playKey)) && players_tics[player2].length < 4)
+	}
+	box_k = document.getElementById(playKey)
+	box_k.classList.add('comp')
+	return playKey;
+}
+for (tic of tics) {
+	tic.addEventListener('click', take);
+}
+function alt_turn(){
+	player_id = nextPlayer;
+	indexPlayer = players.indexOf(player_id)
+	return nextPlayer = players[Number(!indexPlayer)];
+}
+function displayTic(box, player){
+	box.innerHTML = `<div>${players_sign[player]}</div>`;
+}
+function playerArrayHasCombo(combo, player){
+	return combo.every(z=>players_tics[player].includes(z))
+}
+function checkWin(player){
+	let win = false;
+	comboArray.forEach(x=>{
+		if(playerArrayHasCombo(x,player)){
+			win = true;
+		}
+	})
+	return win;
+}
+function populatePlayerTics(data, player){
+	players_tics[player].push(parseInt(data));
+}
+function disableGame(winner){
+	disabler = document.getElementById('disable')
+	disabler.classList.add('disabled')
+	disabler.classList.remove('hide')
+}
+
+// Initialize Cloud Firestore through Firebase
+firebase.initializeApp({
+  apiKey: 'AIzaSyBm1c8O2tsmiBEaxhexP2N93mtlP31LRPw',
+  authDomain: '### FIREBASE AUTH DOMAIN ###',
+  projectId: 'tic-tac-toe-7a73c'
+});
+
+var db = firebase.firestore();
+
+db.collection("users").get().then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+        console.log(doc.data());
+    });
+});
+
 </body>
 </html>
