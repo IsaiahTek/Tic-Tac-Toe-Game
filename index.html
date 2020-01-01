@@ -90,16 +90,6 @@
 			background-color: orange !important;
 		}
   </style>
-  
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/7.6.1/firebase-app.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/7.6.1/firebase-auth.js"></script>
-    <script defer src="/__/firebase/7.6.1/firebase-database.js"></script>
-    <script defer src="/__/firebase/7.6.1/firebase-messaging.js"></script>
-    <script defer src="/__/firebase/7.6.1/firebase-storage.js"></script>
-    <!-- initialize the SDK after all desired features are loaded -->
-    <!-- <script defer src="/__/firebase/init.js"></script> -->
 
     
   </head>
@@ -127,22 +117,7 @@
       <div class="winner-box" id="winner_box"></div>
       <button id="" class="btn" onclick="location.reload()">Refresh to Play Again</button>
     </section>
-  
-    <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script src="/__/firebase/7.6.1/firebase-app.js"></script>
-  
-    <!-- TODO: Add SDKs for Firebase products that you want to use
-         https://firebase.google.com/docs/web/setup#available-libraries -->
-    <script src="/__/firebase/7.6.1/firebase-analytics.js"></script>
-
-    
-    <!-- For firebase-firestore -->
-    <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-firestore.js"></script>
-
-
-    <!-- Initialize Firebase -->
-    <!-- <script src="/__/firebase/init.js"></script> -->
-
+ 
     <script>
 
 let player1 = 'Me',
@@ -269,21 +244,5 @@ function disableGame(winner){
 	disabler.classList.add('disabled')
 	disabler.classList.remove('hide')
 }
-
-// Initialize Cloud Firestore through Firebase
-firebase.initializeApp({
-  apiKey: 'AIzaSyBm1c8O2tsmiBEaxhexP2N93mtlP31LRPw',
-  authDomain: '### FIREBASE AUTH DOMAIN ###',
-  projectId: 'tic-tac-toe-7a73c'
-});
-
-var db = firebase.firestore();
-
-db.collection("users").get().then((querySnapshot) => {
-    querySnapshot.forEach((doc) => {
-        console.log(doc.data());
-    });
-});
-
 </body>
 </html>
