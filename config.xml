@@ -31,4 +31,6 @@
   <preference name="android-minSdkVersion" value="19" />
   <preference name="android-installLocation" value="auto" />
   <preference name="android-windowSoftInputMode" value="stateVisible|adjustResize" />
+    
+  <icon src="icon.png" platform="android"/>
 </widget>
