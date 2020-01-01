@@ -39,7 +39,7 @@
   <allow-intent href="mailto:*"/>
   <allow-intent href="geo:*"/>
   <allow-navigation href="*" />
-  <access origin="*" subdomains="true" />
+<!--   <access origin="*" subdomains="true" /> -->
     
   <icon src="icon.png" platform="android"/>
 </widget>
